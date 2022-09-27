@@ -6,15 +6,14 @@ HTML Parser to use is BeautifulSoup: one of the best xml and html parsers
 from bs4 import BeautifulSoup
 import requests
 from requests.exceptions import HTTPError
-import sys      # allows me to grab arguments
-
+import sys  # allows me to grab arguments
 
 if __name__ == '__main__':
-    for url in sys.argv[1:]:
 
-        # add https to url without protocol with layer
-        if not url.lower().startswith('http'):
-            url = f'https://{url}'
+    for term in sys.argv[1:]:
+
+        # add the term to the wikipedia url
+        url = f'https://www.wikipedia.org/wiki/{term}_(disambiguation)'
 
         # Gets website url and provides response
         # if error - exits with exception
@@ -30,7 +29,7 @@ if __name__ == '__main__':
         # open our page with beautifulSoup to parse it and find information
         soup = BeautifulSoup(response.text, 'html.parser')
 
-        for link in soup.findAll("h3"):
-            print(link.div.string)
-        # print(f"Yeah! worked!\n\n{soup.prettify()}")
-
+        # for link in soup.findAll(href=True):
+        for blockClass in soup.findAll('div', attrs={'class': 'mw-parser-output'}):
+            for link in blockClass.findAll(href=True):
+                print(link.get_text())
