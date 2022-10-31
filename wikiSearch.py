@@ -5,10 +5,14 @@ HTML Parser to use is BeautifulSoup: one of the best xml and html parsers
 
 import argparse  # allows me to grab arguments
 import sys
+from urllib.parse import urlparse
+
 import requests
 from bs4 import BeautifulSoup
 from requests.exceptions import HTTPError
 
+site = ""
+query = ""
 
 # dispatch tables for dictionary
 def search_google(terms, depth):
@@ -51,9 +55,10 @@ def search_gutenberg(terms, depth):
 
     for link in soup.findAll("a", href=True):
         if "Alice's Adventures in Wonderland" in link.text:
-            print(link['href'][depth:])
-            return link['href'][depth:]
-
+            follow = urlparse(link['href'][depth:]).hostname
+            if follow:
+                return f'https://{follow}'
+    return ""
 
 
 sites = {
@@ -74,9 +79,13 @@ def init():
     args = sysargs.parse_args()
 
     # check that all args were passed
+    global sites
+    global query
     site = str(args.site).lower()
+
     try:
-        if sites[site] is not None and args.query:
+        if args.query:
+            query = args.query
             return sites.get(site)(args.query, args.depth)
         else:
             print("You must pass three arguments: (-s, --site) and (-q, --query) both type strings and (-d, --depth) "
@@ -103,7 +112,11 @@ def get_response(url):
 
 
 if __name__ == '__main__':
-    uri = init()
 
-    print(get_response(uri))
+    uri = init()
+    if get_response(uri):
+        with open(f'{site}_{query}.txt', "w", encoding="utf-8") as newFile:
+            newFile.write(get_response(uri))
+    else:
+        print("First link was un-followable or no links found.")
     # open our page with beautifulSoup to parse it and find information
