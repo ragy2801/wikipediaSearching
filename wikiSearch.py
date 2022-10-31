@@ -70,7 +70,7 @@ def init():
     sysargs = argparse.ArgumentParser(description="Loads passed shortcuts to file after initial cleaning (munging).")
     sysargs.add_argument("-q", "--query", help="The term(s) to search for.")
     sysargs.add_argument("-s", "--site", help="The site to search (google, wikipedia, gutenberg, amazon")
-    sysargs.add_argument("-d", "--depth", Type=int, help="Amount of links you want to pass to file! Must be int value!")
+    sysargs.add_argument("-d", "--depth", type=int, help="Amount of links you want to pass to file! Must be int value!")
     args = sysargs.parse_args()
 
     # check that all args were passed
